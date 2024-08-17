@@ -1,57 +1,55 @@
-
-
 body {
-    background-color: #ffe6f2;
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  h2 {
-    margin-top: 20px;
-    font-size: 24px;
-    color: hotpink;
-  }
-  
-  .app-container {
-    padding: 20px;
-  }
-  
-  .card {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-title {
-    font-weight: bold;
-  }
-  
-  .card-text {
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .button-outline-primary:hover,
-  .button-outline-danger:hover {
-    background-color: hotpink;
-    color: white;
-  }
-  
-  .navbar-brand,
-  .navbar-nav .nav-link {
-    color: hotpink !important;
-  }
-  
-  .navbar-nav .nav-link.active {
-    font-weight: bold;
-    text-decoration: underline;
-  }
-  
-  .d-flex {
-    margin-top: 20px;
-  }
-  
-  .content {
-    margin-top: 20px;
-  }
-  
+  background-color: #ffe6f2;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  margin-top: 20px;
+  font-size: 24px;
+  color: hotpink;
+}
+
+.app-container {
+  padding: 20px;
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 14px;
+  color: #333;
+}
+
+.button-outline-primary:hover,
+.button-outline-danger:hover {
+  background-color: hotpink;
+  color: white;
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+  color: hotpink !important;
+}
+
+.navbar-nav .nav-link.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.d-flex {
+  margin-top: 20px;
+}
+
+.content {
+  margin-top: 20px;
+}
+

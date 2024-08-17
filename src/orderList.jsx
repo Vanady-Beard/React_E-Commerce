@@ -1,5 +1,3 @@
-// src/OrderList.jsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button } from 'react-bootstrap';
@@ -24,6 +22,15 @@ const OrderList = () => {
     fetchOrders();
   }, []);
 
+  const cancelOrder = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/orders/${id}`);
+      setOrders(orders.filter(order => order.orderID !== id));
+    } catch (err) {
+      console.error('Failed to cancel order:', err);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -40,7 +47,11 @@ const OrderList = () => {
               <Card.Title>Order #{order.orderID}</Card.Title>
               <Card.Text>Customer: {order.customerName}</Card.Text>
               <Card.Text>Order Date: {order.orderDate}</Card.Text>
-              <Button variant="outline-danger" style={{ borderColor: 'hotpink', color: 'hotpink' }}>
+              <Button
+                variant="outline-danger"
+                style={{ borderColor: 'hotpink', color: 'hotpink' }}
+                onClick={() => cancelOrder(order.orderID)}
+              >
                 Cancel Order
               </Button>
             </Card.Body>
@@ -52,4 +63,5 @@ const OrderList = () => {
 };
 
 export default OrderList;
+
 

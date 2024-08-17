@@ -1,121 +1,132 @@
-// src/CustomerDetails.jsx
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Form, Modal } from 'react-bootstrap';
+import { Card, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const CustomerDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [showEdit, setShowEdit] = useState(false);
-  const [updatedCustomer, setUpdatedCustomer] = useState({ name: '', email: '', phone: '' });
+  const [customer, setCustomer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
 
-  const handleCloseEdit = () => setShowEdit(false);
-  const handleShowEdit = () => {
-    setUpdatedCustomer({
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/customers/${id}`);
+        setCustomer(response.data);
+        setFormData({ name: response.data.name, email: response.data.email, phone: response.data.phone });
+      } catch (err) {
+        setError('Failed to fetch customer.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomer();
+  }, [id]);
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
-    setShowEdit(true);
   };
 
-  const customers = [
-    { id: 1, name: 'Alice Wonderland', email: 'alice@wonderland.com', phone: '123-456-7890' },
-    { id: 2, name: 'Cinderella Charming', email: 'cinderella@charming.com', phone: '234-567-8901' },
-    { id: 3, name: 'Belle Beauty', email: 'belle@beauty.com', phone: '345-678-9012' },
-  ];
-  const customer = customers.find((customer) => customer.id === parseInt(id, 10));
+  const handleUpdate = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/customers/${id}`, formData);
+      setCustomer({ ...customer, ...formData });
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Failed to update customer:', err);
+    }
+  };
 
-  if (!customer) return <div>Customer not found</div>;
-
-  const handleDeleteCustomer = async () => {
+  const deleteCustomer = async () => {
     try {
       await axios.delete(`http://localhost:5000/api/customers/${id}`);
       navigate('/customers');
     } catch (err) {
-      console.error('Failed to delete customer.');
+      console.error('Failed to delete customer:', err);
     }
   };
 
-  const handleUpdateCustomer = async () => {
-    try {
-      await axios.put(`http://localhost:5000/api/customers/${id}`, updatedCustomer);
-      setShowEdit(false);
-      navigate('/customers');
-    } catch (err) {
-      console.error('Failed to update customer.');
-    }
-  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!customer) return <div>No customer found</div>;
 
   return (
     <Card style={{ width: '24rem', margin: '20px auto', borderColor: 'hotpink' }}>
       <Card.Body>
-        <Card.Title style={{ color: 'hotpink' }}>{customer.name}</Card.Title>
-        <Card.Text>Email: {customer.email}</Card.Text>
-        <Card.Text>Phone: {customer.phone}</Card.Text>
-        <Button
-          variant="outline-primary"
-          style={{ borderColor: 'hotpink', color: 'hotpink', marginRight: '10px' }}
-          onClick={handleShowEdit}
-        >
-          Edit Customer
-        </Button>
-        <Button
-          variant="outline-danger"
-          style={{ borderColor: 'hotpink', color: 'hotpink' }}
-          onClick={handleDeleteCustomer}
-        >
-          Delete Customer
-        </Button>
-      </Card.Body>
-
-      <Modal show={showEdit} onHide={handleCloseEdit}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Customer</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        {isEditing ? (
           <Form>
             <Form.Group controlId="formName">
               <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter name"
-                value={updatedCustomer.name}
-                onChange={(e) => setUpdatedCustomer({ ...updatedCustomer, name: e.target.value })}
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
               />
             </Form.Group>
-            <Form.Group controlId="formEmail">
-              <Form.Label>Email address</Form.Label>
+            <Form.Group controlId="formEmail" className="mt-3">
+              <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email"
-                value={updatedCustomer.email}
-                onChange={(e) => setUpdatedCustomer({ ...updatedCustomer, email: e.target.value })}
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
               />
             </Form.Group>
-            <Form.Group controlId="formPhone">
+            <Form.Group controlId="formPhone" className="mt-3">
               <Form.Label>Phone</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter phone"
-                value={updatedCustomer.phone}
-                onChange={(e) => setUpdatedCustomer({ ...updatedCustomer, phone: e.target.value })}
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
               />
             </Form.Group>
+            <Button
+              variant="outline-success"
+              style={{ borderColor: 'hotpink', color: 'hotpink', marginTop: '10px' }}
+              onClick={handleUpdate}
+            >
+              Save
+            </Button>
+            <Button
+              variant="outline-secondary"
+              style={{ borderColor: 'hotpink', color: 'hotpink', marginTop: '10px', marginLeft: '10px' }}
+              onClick={() => setIsEditing(false)}
+            >
+              Cancel
+            </Button>
           </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseEdit}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleUpdateCustomer}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        ) : (
+          <>
+            <Card.Title style={{ color: 'hotpink' }}>{customer.name}</Card.Title>
+            <Card.Text>Email: {customer.email}</Card.Text>
+            <Card.Text>Phone: {customer.phone}</Card.Text>
+            <Button
+              variant="outline-primary"
+              style={{ borderColor: 'hotpink', color: 'hotpink', marginRight: '10px' }}
+              onClick={() => setIsEditing(true)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="outline-danger"
+              style={{ borderColor: 'hotpink', color: 'hotpink' }}
+              onClick={deleteCustomer}
+            >
+              Delete
+            </Button>
+          </>
+        )}
+      </Card.Body>
     </Card>
   );
 };
